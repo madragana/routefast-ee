@@ -12,9 +12,9 @@ jobs:
     env:
       DATABASE_URL: postgres://yugabyte:yugabyte@localhost:5433/yugabyte
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version: "1.22"
           cache: true
@@ -52,7 +52,7 @@ jobs:
         run: go test -race -coverprofile=coverage.out ./...
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v6
         with:
           files: coverage.out
         continue-on-error: true
