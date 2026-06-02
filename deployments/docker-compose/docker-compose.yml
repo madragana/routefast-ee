@@ -1,0 +1,35 @@
+services:
+  yugabyte:
+    image: yugabytedb/yugabyte:2.20.2.0-b145
+    container_name: routefast-ee-yb
+    command: >
+      bin/yugabyted start --daemon=false
+      --tserver_flags=ysql_enable_auth=false
+    ports:
+      - "5433:5433"   # YSQL (PostgreSQL wire)
+      - "7000:7000"   # master UI
+      - "9000:9000"   # tserver UI
+    volumes:
+      - yb-data:/home/yugabyte/yb_data
+    healthcheck:
+      test: ["CMD", "bin/yugabyted", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  # One-shot job that applies all migrations once the database is healthy.
+  migrate:
+    image: postgres:16-alpine
+    depends_on:
+      yugabyte:
+        condition: service_healthy
+    volumes:
+      - ../../migrations:/migrations:ro
+    entrypoint: >
+      sh -c "for f in /migrations/*.sql; do
+               echo applying $$f;
+               psql postgres://yugabyte@yugabyte:5433/yugabyte -f $$f;
+             done"
+
+volumes:
+  yb-data:

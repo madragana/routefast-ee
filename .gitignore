@@ -1,0 +1,32 @@
+# Build artifacts
+bin/
+dist/
+*.o
+*.a
+
+# Test coverage
+coverage.out
+coverage.html
+*.test
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment & secrets
+.env
+.env.local
+tls/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary
+tmp/
+temp/
+*.tmp
+vendor/

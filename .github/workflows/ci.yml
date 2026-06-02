@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    services:
+      yugabyte:
+        image: yugabytedb/yugabyte:2.20.2.0-b145
+        ports:
+          - 5433:5433
+        options: >-
+          --health-cmd "bin/yugabyted status"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      DATABASE_URL: postgres://yugabyte:yugabyte@localhost:5433/yugabyte
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: true
+
+      - name: Apply migrations
+        run: |
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+          for f in migrations/*.sql; do psql "$DATABASE_URL" -f "$f"; done
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Gofmt check
+        run: test -z "$(gofmt -l .)"
+
+      - name: Test
+        run: go test -race -coverprofile=coverage.out ./...
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.out
+        continue-on-error: true

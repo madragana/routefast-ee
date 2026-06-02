@@ -1,0 +1,46 @@
+RouteFast Enterprise Edition License Agreement
+
+Copyright (c) 2026 AOvidi Ltd
+
+DEFINITIONS
+"Software" = RouteFast Enterprise Edition code in the routefast-ee repository.
+"Customer" = an organization with a valid subscription.
+"Production Use" = running the Software in live network operations.
+
+GRANT OF RIGHTS
+Subject to a valid subscription and compliance with this Agreement, Customer may:
+- Use the Software in Production (tier limits apply).
+- Access source code for audit, security review, and code inspection.
+- Deploy on-premises or in the cloud.
+
+RESTRICTIONS
+Customer may NOT:
+- Use the Software in Production without a valid subscription.
+- Redistribute, sublicense, or copy the Software.
+- Modify the Software except for audit purposes (non-Production).
+- Use the Software in competing products.
+
+FEES & TERM
+- Annual subscription (auto-renew unless cancelled 30 days prior).
+- Perpetual licence with annual support/update renewal.
+- Payment due upon invoice.
+
+SUPPORT & SLA
+- Included: security patches, bug fixes.
+- Not included: customization, feature development, training.
+
+LIMITATION OF LIABILITY
+Software provided AS-IS. AOvidi Ltd is not liable for data loss, downtime, or
+indirect damages. Maximum liability = subscription fees paid in the last 12
+months.
+
+TERMINATION
+Upon expiry or breach:
+- Licenses terminate immediately.
+- Customer must cease use within 30 days.
+- Audit logs retained by AOvidi Ltd for 12 months.
+
+GOVERNING LAW
+England and Wales. Disputes resolved under English law.
+
+Questions: legal@aovidi.com
