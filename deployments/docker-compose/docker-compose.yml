@@ -3,7 +3,7 @@ services:
     image: yugabytedb/yugabyte:2.20.2.0-b145
     container_name: routefast-ee-yb
     command: >
-      bin/yugabyted start --daemon=false
+      bin/yugabyted start --background=false
       --tserver_flags=ysql_enable_auth=false
     ports:
       - "5433:5433"   # YSQL (PostgreSQL wire)

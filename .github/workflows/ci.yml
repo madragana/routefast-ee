@@ -9,16 +9,6 @@ on:
 jobs:
   build-test:
     runs-on: ubuntu-latest
-    services:
-      yugabyte:
-        image: yugabytedb/yugabyte:2.20.2.0-b145
-        ports:
-          - 5433:5433
-        options: >-
-          --health-cmd "bin/yugabyted status"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 12
     env:
       DATABASE_URL: postgres://yugabyte:yugabyte@localhost:5433/yugabyte
     steps:
@@ -29,9 +19,27 @@ jobs:
           go-version: "1.22"
           cache: true
 
-      - name: Apply migrations
+      - name: Start YugabyteDB
+        run: |
+          docker run -d --name yugabyte \
+            -p 5433:5433 -p 7000:7000 -p 9000:9000 -p 15433:15433 \
+            yugabytedb/yugabyte:2.20.2.0-b145 \
+            bin/yugabyted start --background=false \
+            --tserver_flags=ysql_enable_auth=false
+
+      - name: Wait for YSQL
         run: |
           sudo apt-get update && sudo apt-get install -y postgresql-client
+          for i in $(seq 1 60); do
+            if pg_isready -h localhost -p 5433 -U yugabyte >/dev/null 2>&1; then
+              echo "YugabyteDB is ready"; exit 0
+            fi
+            echo "waiting for YugabyteDB... ($i)"; sleep 3
+          done
+          echo "YugabyteDB did not become ready"; docker logs yugabyte; exit 1
+
+      - name: Apply migrations
+        run: |
           for f in migrations/*.sql; do psql "$DATABASE_URL" -f "$f"; done
 
       - name: Vet
