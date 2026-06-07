@@ -17,6 +17,7 @@ import (
 
 	"github.com/madragana/routefast-ee/internal/api"
 	"github.com/madragana/routefast-ee/internal/config"
+	"github.com/madragana/routefast-ee/internal/rag"
 	"github.com/madragana/routefast-ee/internal/storage"
 )
 
@@ -35,6 +36,16 @@ func main() {
 	defer store.Close()
 
 	srv := &api.Server{Store: store, Cfg: cfg}
+
+	if rcfg := rag.ConfigFromEnv(); rcfg.Enabled {
+		rsvc, err := rag.New(rcfg, store)
+		if err != nil {
+			log.Printf("[rag] disabled: %v", err)
+		} else {
+			srv.RAG = rsvc
+			log.Printf("[rag] enabled (embed=%s llm=%s)", rcfg.EmbedBackend, rcfg.LLMBackend)
+		}
+	}
 
 	tlsCfg, err := buildTLS(cfg)
 	if err != nil {

@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/madragana/routefast-ee/internal/config"
+	"github.com/madragana/routefast-ee/internal/rag"
 	"github.com/madragana/routefast-ee/internal/storage"
 )
 
@@ -20,9 +21,10 @@ import (
 type Server struct {
 	Store *storage.Store
 	Cfg   *config.Config
+	RAG   *rag.Service // optional advisory copilot; nil when RAG_ENABLED is false
 }
 
-// Routes returns the configured mux with all 7 endpoints registered.
+// Routes returns the configured mux with all endpoints registered.
 func (s *Server) Routes() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/v1/health", s.handleHealth)
@@ -32,6 +34,8 @@ func (s *Server) Routes() http.Handler {
 	mux.HandleFunc("GET /api/v1/policies", s.requireToken(s.handlePolicies))
 	mux.HandleFunc("POST /api/v1/audit/log", s.requireToken(s.handleAuditLog))
 	mux.HandleFunc("GET /api/v1/audit/trail", s.requireToken(s.handleAuditTrail))
+	mux.HandleFunc("POST /api/v1/ask", s.requireToken(s.handleAsk))
+	mux.HandleFunc("POST /api/v1/reindex", s.requireToken(s.handleReindex))
 	return logging(mux)
 }
 
